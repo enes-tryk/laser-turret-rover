@@ -18,7 +18,7 @@ void setup() {
   pinMode(signalL, OUTPUT);
   pinMode(headlight, OUTPUT);
   pinMode(horn, OUTPUT);
-  
+
   pinMode(motorR1, OUTPUT);
   pinMode(motorR2, OUTPUT);
   pinMode(motorL1, OUTPUT);
@@ -47,7 +47,7 @@ void loop() {
 
   else if (GamePad.isLeftPressed()) {
     digitalWrite(signalL, (millis() / 350) % 2);
-    
+
     digitalWrite(motorR1, LOW);
     digitalWrite(motorR2, HIGH);
     digitalWrite(motorL1, HIGH);
@@ -56,24 +56,24 @@ void loop() {
 
   else if (GamePad.isRightPressed()) {
     digitalWrite(signalR, (millis() / 350) % 2);
-    
+
     digitalWrite(motorR1, HIGH);
     digitalWrite(motorR2, LOW);
     digitalWrite(motorL1, LOW);
     digitalWrite(motorL2, HIGH);
   }
-  
+
   else if (GamePad.isSquarePressed()) {
     tone(horn, 750, 10);
   }
 
   else if (GamePad.isCirclePressed()) {
-    
+
     if (digitalRead(headlight) == LOW) {
       digitalWrite(headlight, HIGH);
       delay(250);
     }
-    
+
     else if (digitalRead(headlight) == HIGH) {
       digitalWrite(headlight, LOW);
       delay(250);
@@ -85,7 +85,7 @@ void loop() {
     digitalWrite(motorR2, LOW);
     digitalWrite(motorL1, LOW);
     digitalWrite(motorL2, LOW);
-    
+
     digitalWrite(signalR, LOW);
     digitalWrite(signalL, LOW);
   }
