@@ -1,28 +1,40 @@
 #define CUSTOM_SETTINGS
 #define INCLUDE_GAMEPAD_MODULE
+
 #include <Dabble.h>
+#include <Servo.h>
 
-int signalR = 12;
-int signalL = 11;
-int headlight = 13;
-int horn = 4;
+Servo horizontal;
+Servo vertical;
 
-int motorR1 = 9;
-int motorR2 = 8;
-int motorL1 = 6;
-int motorL2 = 7;
+int horizAngle = 1500;
+int vertiAngle = 1500;
+
+int horn = 8;
+int laser = 11;
+int LED = 12;
+
+bool turret = false;
+bool Switch = false;
+
+int in1 = 4;
+int in2 = 5;
+int in3 = 6;
+int in4 = 7;
 
 void setup() {
 
-  pinMode(signalR, OUTPUT);
-  pinMode(signalL, OUTPUT);
-  pinMode(headlight, OUTPUT);
   pinMode(horn, OUTPUT);
+  pinMode(laser, OUTPUT);
+  pinMode(LED, OUTPUT);
 
-  pinMode(motorR1, OUTPUT);
-  pinMode(motorR2, OUTPUT);
-  pinMode(motorL1, OUTPUT);
-  pinMode(motorL2, OUTPUT);
+  vertical.attach(10);
+  horizontal.attach(9);
+
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  pinMode(in3, OUTPUT);
+  pinMode(in4, OUTPUT);
 
   Serial.begin(9600);
   Dabble.begin(9600);
@@ -31,62 +43,127 @@ void setup() {
 void loop() {
   Dabble.processInput();
 
-  if (GamePad.isUpPressed()) {
-    digitalWrite(motorR1, LOW);
-    digitalWrite(motorR2, HIGH);
-    digitalWrite(motorL1, LOW);
-    digitalWrite(motorL2, HIGH);
-  }
+  if (turret == false) {
+    digitalWrite(LED, HIGH);
+    digitalWrite(laser, LOW);
 
-  else if (GamePad.isDownPressed()) {
-    digitalWrite(motorR1, HIGH);
-    digitalWrite(motorR2, LOW);
-    digitalWrite(motorL1, HIGH);
-    digitalWrite(motorL2, LOW);
-  }
-
-  else if (GamePad.isLeftPressed()) {
-    digitalWrite(signalL, (millis() / 350) % 2);
-
-    digitalWrite(motorR1, LOW);
-    digitalWrite(motorR2, HIGH);
-    digitalWrite(motorL1, HIGH);
-    digitalWrite(motorL2, LOW);
-  }
-
-  else if (GamePad.isRightPressed()) {
-    digitalWrite(signalR, (millis() / 350) % 2);
-
-    digitalWrite(motorR1, HIGH);
-    digitalWrite(motorR2, LOW);
-    digitalWrite(motorL1, LOW);
-    digitalWrite(motorL2, HIGH);
-  }
-
-  else if (GamePad.isSquarePressed()) {
-    tone(horn, 750, 10);
-  }
-
-  else if (GamePad.isCirclePressed()) {
-
-    if (digitalRead(headlight) == LOW) {
-      digitalWrite(headlight, HIGH);
-      delay(250);
+    if (GamePad.isUpPressed()) {
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, HIGH);
+      digitalWrite(in3, LOW);
+      digitalWrite(in4, HIGH);
     }
 
-    else if (digitalRead(headlight) == HIGH) {
-      digitalWrite(headlight, LOW);
-      delay(250);
+    else if (GamePad.isDownPressed()) {
+      digitalWrite(in1, HIGH);
+      digitalWrite(in2, LOW);
+      digitalWrite(in3, HIGH);
+      digitalWrite(in4, LOW);
+    }
+
+    else if (GamePad.isLeftPressed()) {
+      digitalWrite(in1, HIGH);
+      digitalWrite(in2, LOW);
+      digitalWrite(in3, LOW);
+      digitalWrite(in4, HIGH);
+    }
+
+    else if (GamePad.isRightPressed()) {
+      digitalWrite(in1, LOW);
+      digitalWrite(in2, HIGH);
+      digitalWrite(in3, HIGH);
+      digitalWrite(in4, LOW);
+    }
+
+    else if (GamePad.isSquarePressed()) {
+      tone(horn, 750, 10);
+    }
+
+    else if (GamePad.isCirclePressed()) {
+
+      if (turret == false && Switch) {
+        turret = true;
+        Switch = false;
+      }
+
+
+      else if (turret == true && Switch) {
+        turret = false;
+        Switch = false;
+      }
+    }
+
+    else if (!GamePad.isCirclePressed()) {
+      Switch = true;
     }
   }
 
-  else {
-    digitalWrite(motorR1, LOW);
-    digitalWrite(motorR2, LOW);
-    digitalWrite(motorL1, LOW);
-    digitalWrite(motorL2, LOW);
+  else if (turret == true) {
+    digitalWrite(LED, LOW);
+    digitalWrite(laser, HIGH);
 
-    digitalWrite(signalR, LOW);
-    digitalWrite(signalL, LOW);
+    if (GamePad.isUpPressed()) {
+      vertiAngle = vertiAngle - 10;
+      vertical.writeMicroseconds(vertiAngle);
+    }
+
+    else if (GamePad.isDownPressed()) {
+      vertiAngle = vertiAngle + 10;
+      vertical.writeMicroseconds(vertiAngle);
+    }
+
+    else if (GamePad.isLeftPressed()) {
+      horizAngle = horizAngle + 10;
+      horizontal.writeMicroseconds(horizAngle);
+    }
+
+    else if (GamePad.isRightPressed()) {
+      horizAngle = horizAngle - 10;
+      horizontal.writeMicroseconds(horizAngle);
+    }
+
+    else if (GamePad.isSquarePressed()) {
+      tone(horn, 750, 10);
+    }
+
+    else if (GamePad.isCirclePressed()) {
+      if (turret == false && Switch) {
+        turret = true;
+        Switch = false;
+      }
+
+      else if (turret == true && Switch) {
+        turret = false;
+        Switch = false;
+      }
+    }
+
+    else if (!GamePad.isCirclePressed()) {
+      Switch = true;
+    }
+
+    if (horizAngle < 850) {
+      horizAngle = 850;
+    }
+
+    else if (horizAngle > 2200) {
+      horizAngle = 2200;
+    }
+
+    if (vertiAngle < 850) {
+      vertiAngle = 850;
+    }
+
+    else if (vertiAngle > 2200) {
+      vertiAngle = 2200;
+    }
   }
+
+  Serial.println(vertiAngle);
+  Serial.println(horizAngle);
+
+  digitalWrite(in1, LOW);
+  digitalWrite(in2, LOW);
+  digitalWrite(in3, LOW);
+  digitalWrite(in4, LOW);
 }
