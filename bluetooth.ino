@@ -150,18 +150,20 @@ void loop() {
       horizAngle = 2200;
     }
 
-    if (vertiAngle < 850) {
-      vertiAngle = 850;
+    if (vertiAngle < 800) {
+      vertiAngle = 800;
     }
 
-    else if (vertiAngle > 2200) {
-      vertiAngle = 2200;
+    else if (vertiAngle > 2100) {
+      vertiAngle = 2100;
     }
   }
 
-  Serial.println(vertiAngle);
-  Serial.println(horizAngle);
-
+  Serial.print(horizAngle);
+  Serial.print(", ");
+  Serial.print(vertiAngle);
+  Serial.println(" ");
+ 
   digitalWrite(in1, LOW);
   digitalWrite(in2, LOW);
   digitalWrite(in3, LOW);
